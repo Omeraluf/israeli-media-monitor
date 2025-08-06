@@ -22,3 +22,7 @@ Thumbs.db
 
 # Environment files
 .env
+
+# Data outputs
+data/processed/
+data/raw/
