@@ -27,3 +27,20 @@ pip install -r requirements.txt
 ```
 venv\Scripts\activate
 ```
+
+## Erase later:
+
+Scraped and structured data from N12 and Channel 14
+```
+Preprocessed:
+
+Cleaned titles
+
+Normalized dates
+
+Handled bad/missing records
+
+Pushed everything to GitHub
+
+Reviewed the saved JSON (clean and structured)
+```

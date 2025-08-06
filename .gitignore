@@ -26,3 +26,4 @@ Thumbs.db
 # Data outputs
 data/processed/
 data/raw/
+data/final/
