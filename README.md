@@ -1,5 +1,6 @@
 
 ## Folder structure
+```
 israeli-media-monitor/
 │
 ├── scraping/
@@ -16,7 +17,7 @@ israeli-media-monitor/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
-
+```
 
 ## install Requirements
 ```
