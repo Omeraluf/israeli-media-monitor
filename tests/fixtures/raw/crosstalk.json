@@ -1,0 +1,22 @@
+[
+  {
+    "title": "כתבה א",
+    "summary": "טקסט",
+    "url": "https://ex.com/a",
+    "source": "x",
+    "published_iso": "2025-08-10T10:00:00",
+    "published_dt": "2025-08-10T10:00:00",
+    "clean_title": "כתבה א",
+    "dedup_key": "כתבה א_2025-08-10"
+  },
+  {
+    "title": "כתבה ב",
+    "summary": "עוד",
+    "url": "https://ex.com/b",
+    "source": "x",
+    "published_iso": "2025-08-10T10:10:00",
+    "published_dt": "2025-08-10T10:10:00",
+    "clean_title": "כתבה ב",
+    "dedup_key": "כתבה ב_2025-08-10"
+  }
+]

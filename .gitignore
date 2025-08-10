@@ -1,4 +1,4 @@
-# Ignore Python virtual environments
+# Python virtual environments
 venv/
 .env/
 
@@ -6,6 +6,10 @@ venv/
 __pycache__/
 *.py[cod]
 *.so
+
+# Pytest
+.pytest_cache/
+.cache/
 
 # Jupyter Notebooks checkpoints
 .ipynb_checkpoints/
@@ -27,3 +31,9 @@ Thumbs.db
 data/processed/
 data/raw/
 data/final/
+
+# Optional: coverage and build artifacts
+htmlcov/
+.coverage
+build/
+dist/

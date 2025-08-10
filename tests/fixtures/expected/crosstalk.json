@@ -1,0 +1,22 @@
+[
+  {
+    "title": "עדכון",
+    "summary": "פרטים יימסרו בהמשך.",
+    "url": "https://ex.com/u1",
+    "source": "x",
+    "published_iso": "2025-08-10T12:00:00",
+    "published_dt": "2025-08-10T12:00:00",
+    "clean_title": "עדכון",
+    "dedup_key": "עדכון_2025-08-10"
+  },
+  {
+    "title": "ידיעה",
+    "summary": "מידע נוסף בקרוב.",
+    "url": "https://ex.com/u2",
+    "source": "x",
+    "published_iso": "2025-08-10T12:05:00",
+    "published_dt": "2025-08-10T12:05:00",
+    "clean_title": "ידיעה",
+    "dedup_key": "ידיעה_2025-08-10"
+  }
+]

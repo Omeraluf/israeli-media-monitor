@@ -1,0 +1,23 @@
+[
+  {
+    "title": "כתבה א",
+    "summary": "טקסט",
+    "url": "https://ex.com/a",
+    "source": "x",
+    "published_iso": "2025-08-10T10:00:00"
+  },
+  {
+    "title": "כתבה א",
+    "summary": "טקסט",
+    "url": "https://ex.com/a",
+    "source": "x",
+    "published_iso": "2025-08-10T10:05:00"
+  },
+  {
+    "title": "כתבה ב",
+    "summary": "עוד",
+    "url": "https://ex.com/b",
+    "source": "x",
+    "published_iso": "2025-08-10T10:10:00"
+  }
+]

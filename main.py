@@ -8,3 +8,9 @@ if __name__ == "__main__":
     get_n12_rss_headlines()
     get_c14_headlines()
     print("Scraping completed.")
+
+# main flow on terminal:
+# python scraping/scrape_all.py         # to scrape all channels    # implement that later
+# python analysis/preprocessing.py
+# python analysis/group_similar.py
+# python analysis/test_group_similar.py
