@@ -5,6 +5,7 @@ import unicodedata
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
+from analysis.utils.time_labels import is_time_label
 
 # ===== Config =====
 CATEGORY_TITLES = {
@@ -18,6 +19,17 @@ PROCESSED_DIR = Path("data/processed")
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 # ===== Helpers =====
+SEP = r"[|/:;·•–—\-‑‒―־]+"
+BULLETS = r"[•\u2022]"
+def sanitize_for_display(text: str) -> str:
+    if not isinstance(text, str): return ""
+    s = unicodedata.normalize("NFKC", text)
+    s = re.sub(SEP, " ", s)
+    s = re.sub(BULLETS, " ", s)
+    s = "".join(ch for ch in s if unicodedata.category(ch)[0] not in ("P","S"))
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
 def clean_title(title):
     # Normalize unicode (useful for Hebrew and mixed characters)
     title = unicodedata.normalize("NFKC", title or "")
@@ -25,13 +37,13 @@ def clean_title(title):
     title = re.sub(r"\s+", " ", title)      # Collapse whitespace
     return title.strip().lower()
 
-def normalize_summary(text):
-    text = text or ""
-    if isinstance(text, str):
-        text = re.sub(r"\s+", " ", text).strip()
-    else:
-        text = ""
-    return text
+def normalize_summary(text: str) -> str:
+    if not text:
+        return ""
+    text = re.sub(r"[•\u2022]", " ", text)   # drop bullet chars
+    text = re.sub(r"\s+", " ", text)         # collapse whitespace
+    return text.strip()
+
 
 """
 Load all JSON files from the raw data directory.
@@ -49,6 +61,52 @@ def load_raw_json_files():
                 all_records.append(data)
     return all_records
 
+# --- put near your other helpers (top of file) ---
+from collections import Counter, defaultdict
+
+def drop_boilerplate_summaries(records, *, min_count: int = 5, min_ratio: float = 0.5, keep_last_dup: bool = True):
+    """
+    Per-source cleanup:
+      1) If a summary text appears very frequently for a source (>= min_count and covers >= min_ratio of that source),
+         treat it as boilerplate and blank it.
+      2) Optionally keep only the *last* occurrence of any repeated summary text per source (blank earlier ones).
+    Assumes each record has 'source', 'summary' and 'summary_sanitized'.
+    """
+    by_source = defaultdict(list)
+    for i, r in enumerate(records):
+        r["_idx"] = i  # stable position (for 'last' logic)
+        by_source[r.get("source", "")].append(r)
+
+    for src, rows in by_source.items():
+        texts = [(r.get("summary_sanitized", "") or "") for r in rows]
+        n = len(rows)
+        freq = Counter([t for t in texts if t])
+        boiler = {t for t, c in freq.items() if c >= min_count and (c / max(n, 1)) >= min_ratio}
+
+        # 1) drop boilerplate summaries
+        for r in rows:
+            if (r.get("summary_sanitized", "") or "") in boiler:
+                r["summary"] = ""
+                r["summary_sanitized"] = ""
+
+        if keep_last_dup:
+            # keep only the last occurrence of each summary text per source
+            last_idx = {}
+            for r in rows:
+                s = r.get("summary_sanitized", "") or ""
+                if s:
+                    last_idx[s] = r["_idx"]
+            for r in rows:
+                s = r.get("summary_sanitized", "") or ""
+                if s and last_idx.get(s) != r["_idx"]:
+                    r["summary"] = ""
+                    r["summary_sanitized"] = ""
+
+    for r in records:
+        r.pop("_idx", None)
+    return records
+
+
 """
 Preprocess each record:
 - Add a cleaned version of the title
@@ -56,24 +114,33 @@ Preprocess each record:
 - Generate a deduplication key using clean title + date
 - Filter out obviously bad/category-only titles
 """
+# --- replace your preprocess() with this ---
 def preprocess(records):
     cleaned = []
 
     for record in records:
-        # 1. Skip if title is missing/empty or is a category label
+        # 1) Skip if title is missing/empty or is a category label
         raw_title = record.get("title")
         if not raw_title or raw_title.strip() == "" or raw_title.strip() in CATEGORY_TITLES:
-            continue  # title is required and must be a real headline
+            continue
 
-        # 1.1 Normalize summary whitespace; allow empty summary, but not None
-        record["summary"] = normalize_summary(record.get("summary"))
+        # 2) Titles: preserve original, create sanitized (for display/clustering), and clean_title (for keys)
+        record["original_title"] = raw_title or ""
+        record["title_sanitized"] = sanitize_for_display(record["original_title"])
+        record["title"] = record["title_sanitized"]                  # use sanitized by default
+        record["clean_title"] = clean_title(record["original_title"]) # lowercase, machine-friendly
 
-        # 2. Clean title
-        record["clean_title"] = clean_title(raw_title)
+        # 3) Summaries: drop time labels, then normalize + sanitize
+        raw_summary = record.get("summary") or ""
+        if is_time_label(raw_summary):
+            record["summary"] = ""
+        else:
+            record["summary"] = normalize_summary(raw_summary)
+        record["summary_sanitized"] = sanitize_for_display(record["summary"])
 
-        # 3. Handle published_iso
+        # 4) published_iso -> published_dt (best-effort)
         iso_str = record.get("published_iso")
-        if isinstance(iso_str, str):
+        if isinstance(iso_str, str) and iso_str.strip():
             try:
                 record["published_dt"] = datetime.fromisoformat(iso_str)
             except ValueError:
@@ -83,18 +150,17 @@ def preprocess(records):
             record["published_dt"] = None
             record["published_iso"] = ""
 
-        # 4. Set dedup_key
-        if record["published_dt"]:
-            date_str = record["published_dt"].date()
-        else:
-            date_str = "no-date"
+        # 5) dedup_key: clean_title + date/no-date
+        date_part = record["published_dt"].date() if record["published_dt"] else "no-date"
+        record["dedup_key"] = f"{record['clean_title']}_{date_part}"
 
-        record["dedup_key"] = f"{record['clean_title']}_{date_str}"
-
-        # 5. Append cleaned record
         cleaned.append(record)
 
+    # 6) Per-source summary hygiene (C14 issue): drop boilerplate & keep only last occurrence of repeated summaries
+    cleaned = drop_boilerplate_summaries(cleaned, min_count=5, min_ratio=0.5, keep_last_dup=True)
+
     return cleaned
+
 
 
 # ===== DataFrame Hygiene =====
