@@ -32,8 +32,12 @@ data/processed/
 data/raw/
 data/final/
 
+# Ignore archived scraped files
+data/archive/
+
 # Optional: coverage and build artifacts
 htmlcov/
 .coverage
 build/
 dist/
+
