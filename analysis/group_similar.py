@@ -48,11 +48,12 @@ def vectorize(df: pd.DataFrame, stopwords):
 
     print("Vectorizing text with TF-IDF...")
     # char n-grams help for Hebrew; words with stopwords for semantics
-    char_vectorizer = TfidfVectorizer(max_df=0.8, min_df=2, ngram_range=(3, 5), analyzer="char_wb")
+    char_vectorizer = TfidfVectorizer(max_df=0.8, min_df=2, ngram_range=(3, 5), analyzer="char_wb") 
     word_vectorizer = TfidfVectorizer(
         max_df=0.85, min_df=2, ngram_range=(1, 2),
         analyzer="word", stop_words=stopwords
-    )
+    )   
+    
 
     X_char = char_vectorizer.fit_transform(df["text"])
     X_word = word_vectorizer.fit_transform(df["text"])

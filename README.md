@@ -5,7 +5,7 @@ israeli-media-monitor/
 │
 ├── scraping/
 │   ├── base_scraper.py      # Optional: for shared logic
-    ├── kan11_scraper.py
+    ├── kan11_scraper.py    # maybe add telegram \ twitter apis later
     ├── n12_scraper.py
     ├── reshet13_scraper.py
     └── channel14_scraper.py

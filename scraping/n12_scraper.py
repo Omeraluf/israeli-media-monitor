@@ -27,7 +27,7 @@ def get_n12_rss_headlines():
             "published": entry.get("published", None),
             "published_iso": published_dt.isoformat() if published_dt else "",
             "source": "n12",
-            "scraped_at": datetime.now().isoformat()
+            "scraped_at": datetime.now().isoformat(timespec="seconds")
         })
         # print(entry.title[::-1] if 'published' in entry else None)  #only for debugging and reading hebrew on terminal (RTL)
 

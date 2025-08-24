@@ -91,7 +91,6 @@ import json
 import re
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
-from analysis.utils.time_labels import is_time_label
 
 import requests
 from bs4 import BeautifulSoup
@@ -214,47 +213,48 @@ def get_c14_headlines():
 
     headlines = []
     for tag in soup.find_all(["h1", "h2"]):
-        title = (tag.get_text(strip=True) or "").strip()
-        if not title:
-            continue
+        title_raw = (tag.get_text(strip=True) or "").strip()
+        if not title_raw:
+            title_raw = ""
+        
+        # Candidate <p> blocks near the header
+        p1 = tag.find_next("p")
+        summary_raw = (p1.get_text(strip=True) if p1 else "").strip()
 
         # URL from parent/sibling <a>
         a_tag = tag.find_parent("a") or tag.find_next("a")
         href = a_tag.get("href") if a_tag else ""
-        url = urljoin(base, href) if href else ""
+        url_raw = urljoin(base, href) if href else ""
 
-        # Candidate <p> blocks near the header
-        p1 = tag.find_next("p")
-        p1_text = (p1.get_text(strip=True) if p1 else "").strip()
-
-        # Decide summary vs time label
-        if is_time_label(p1_text):
-            summary = ""
-            published_text = p1_text
-        else:
-            summary = p1_text
-            published_text = ""
+        # # Decide summary vs time label
+        # if is_time_label(p1_text):
+        #     summary = ""
+        #     published_text = p1_text
+        # else:
+        #     summary = p1_text
+        #     published_text = ""
 
         # If we didn't find a time label yet, check the next <p>
-        if not published_text:
-            p2 = p1.find_next("p") if p1 else None
-            p2_text = (p2.get_text(strip=True) if p2 else "").strip()
-            if is_time_label(p2_text):
-                published_text = p2_text
-            elif not summary and p2_text and not is_time_label(p2_text):
-                # If summary was empty and p2 looks like content, use it
-                summary = p2_text
 
-        published_iso = parse_hebrew_time(published_text) if published_text else None
+        p2 = p1.find_next("p") if p1 else None
+        published_text_raw = (p2.get_text(strip=True) if p2 else "").strip()
+        # if not published_text:
+            # if is_time_label(p2_text):
+            #     published_text = p2_text
+            # elif not summary and p2_text and not is_time_label(p2_text):
+            #     # If summary was empty and p2 looks like content, use it
+            #     summary = p2_text
+
+        published_iso = parse_hebrew_time(published_text_raw) if published_text_raw else None
 
         headlines.append({
-            "title": title,
-            "summary": summary,                      # blank if it's a time label
-            "url": url,
-            "published": published_text,             # keep raw label for debugging (optional)
-            "published_iso": published_iso or "",    # ISO or empty
+            "title": title_raw,
+            "summary": summary_raw,                      # blank if it's a time label
+            "url": url_raw,
+            "published": published_text_raw,             # keep raw label for debugging (optional)
+            "published_iso": "",                         # add tho the adapter the ISO 8601 format later - YYYY-MM-DDTHH:MM:SS
             "source": "c14",
-            "scraped_at": now.isoformat(),
+            "scraped_at": now.isoformat(timespec="seconds"),
         })
 
     os.makedirs("data/raw", exist_ok=True)
