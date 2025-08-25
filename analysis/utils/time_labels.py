@@ -87,18 +87,44 @@ def parse_hebrew_time_label(raw_text: str, now: datetime) -> str:
                 # default = 1 if no number given ("לפני שעה")
                 num = 1 if not parts[1].isdigit() else int(parts[1])
             except ValueError:
-                return None
+                return ""
 
             unit = parts[-1]  # last word: "שעה", "שעות", "יום", "ימים", "דקה", "דקות"
             if unit.startswith("דק"):
                 dt = now - timedelta(minutes=num)
             elif unit.startswith("שע"):
                 dt = now - timedelta(hours=num)
+            elif unit.startswith("כשע"):
+                dt = now - timedelta(hours=1)
             elif unit.startswith("יום"):
                 dt = now - timedelta(days=num)
             else:
-                return None
+                return ""
             return dt.isoformat(timespec="seconds")
 
+    # "אתמול HH:MM"
+    elif text.startswith("אתמול "):
+        try:
+            hhmm = text.split()[1]
+            dt_time = datetime.strptime(hhmm, "%H:%M").time()
+            dt = datetime.combine(now.date() - timedelta(days=1), dt_time, tzinfo=now.tzinfo)
+            return dt.isoformat(timespec="seconds")
+        except Exception:
+            return ""
+                
+    # "HH:MM" today
+    elif ":" in text and all(part.isdigit() for part in text.split(":")):
+        try:
+            dt_time = datetime.strptime(text, "%H:%M").time()
+            dt = datetime.combine(now.date(), dt_time, tzinfo=now.tzinfo)
+            # handle edge case: if that time hasn't occurred yet today (e.g. now=05:30, label=06:05),
+            # some sites mean "today earlier", some mean "yesterday evening"
+            if dt > now:
+                dt -= timedelta(days=1)
+            return dt.isoformat(timespec="seconds")
+        except Exception:
+            return ""
+    
+
     # fallback: not recognized
-    return None
+    return ""

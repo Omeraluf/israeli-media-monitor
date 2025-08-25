@@ -95,6 +95,8 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
+MAX_ITEMS = 14 # TODO - Remove whenever needs more stories
+
 # --- Generic time-label detection & parsing (Hebrew + basic English) ---
 
 DEFAULT_TZ = timezone(timedelta(hours=3))  # Asia/Jerusalem (simple, 3.8-friendly)
@@ -212,7 +214,10 @@ def get_c14_headlines():
     now = datetime.now(DEFAULT_TZ)
 
     headlines = []
+    count = 0
     for tag in soup.find_all(["h1", "h2"]):
+        if count >= MAX_ITEMS:
+            break
         title_raw = (tag.get_text(strip=True) or "").strip()
         if not title_raw:
             title_raw = ""
@@ -256,6 +261,7 @@ def get_c14_headlines():
             "source": "c14",
             "scraped_at": now.isoformat(timespec="seconds"),
         })
+        count += 1
 
     os.makedirs("data/raw", exist_ok=True)
     out_fn = f"data/raw/c14_scraped_{now.date()}.json"

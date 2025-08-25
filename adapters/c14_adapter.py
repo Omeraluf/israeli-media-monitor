@@ -25,15 +25,22 @@ def adapt_records(raw_records):
     for record in raw_records:
         published = record.get("published", "").strip()
         if is_time_label(published):
-            print("------------------- Time LABEL Detected -------------------")
+
             published_iso = parse_hebrew_time_label(published, now=datetime.fromisoformat(record["scraped_at"]))
-            print(f"Parsed to ISO: {published_iso}")
-            print("-----------------------------------------------------------")
+
+            if not published_iso and published:
+                print("------------------- Time LABEL Detected -------------------")
+                print(f"published label: {published}")
+                print(f"published_iso: {published_iso}")
+                print("-----------------------------------------------------------")
+
         else:
-            print(f"Warning: unexpected published label (not a time label): '{published}' ############## FIX ME! ##############")
+            # print(f"Warning: unexpected published label (not a time label): '{published}'")
+            published = ""
             published_iso = ""
 
         record["published_iso"] = published_iso
+        record["published"] = published
         out.append(record)
     return out
 
@@ -45,7 +52,7 @@ def main():
             raw_records = json.load(f)      #list of dicts
     
     # 2) Adapt each record
-        adapt_records = adapt_records(raw_records)
+        adapted_records = adapt_records(raw_records)
 
      # 3) decide output filename
         filename = os.path.basename(in_path).replace("scraped_", "adapted_")
@@ -53,7 +60,7 @@ def main():
     
      # 4) save
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(adapt_records, f, ensure_ascii=False, indent=2)
+        json.dump(adapted_records, f, ensure_ascii=False, indent=2)
     
     print(f"C14 Adapted data saved to {out_path}")
 

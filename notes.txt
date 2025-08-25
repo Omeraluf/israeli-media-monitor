@@ -1,0 +1,77 @@
+# how to get stuff from JSON file
+ # Works in PowerShell 5.1 and 7+  
+Get-Content -Raw -Encoding UTF8 "data\adapted\c14_adapted_2025-08-25.json" |
+ConvertFrom-Json |
+ForEach-Object { $_.published } |
+Set-Content -Encoding UTF8 "data\raw\published_list.txt"
+
+
+Great question — this is the *heart* of your project. Once you’ve clustered/grouped together articles that refer to the **same event**, there are several levels of analysis you can do to compare **how** outlets present it.
+
+Here are the main approaches, from simple → advanced:
+
+---
+
+### 🔹 1. **Surface-level comparison**
+
+* **Headline wording**: Compare length, sentiment, and key terms (e.g., “terrorist” vs. “gunman” vs. “youth”).
+* **Summary differences**: Does one outlet emphasize victims, while another emphasizes police response?
+* **Order of information**: Who/what is mentioned first (victims, government, politics, economy)?
+
+---
+
+### 🔹 2. **Linguistic framing**
+
+* **Sentiment analysis**: Positive/negative/neutral tone toward subjects (government, protesters, military).
+* **Subjectivity vs. objectivity**: Does the outlet use factual, neutral terms, or emotionally loaded words?
+* **Framing devices**: Choice of metaphors or labels (e.g., “clash” vs. “attack,” “settler” vs. “resident”).
+
+---
+
+### 🔹 3. **Content emphasis**
+
+* **Entity coverage**: Which people, groups, or places are mentioned? (Named Entity Recognition).
+* **Topic distribution**: Using LDA or similar, see what themes are emphasized (security, politics, economy).
+* **Quote analysis**: Who is quoted? Officials, eyewitnesses, victims, experts? Which voices are missing?
+
+---
+
+### 🔹 4. **Quantitative bias indicators**
+
+* **Length of coverage**: Word count, number of articles per event.
+* **Placement**: Time of publishing (breaking news vs. late report).
+* **Frequency of coverage**: Does one site cover it 10 times, while another barely mentions it?
+
+---
+
+### 🔹 5. **Cross-outlet comparison metrics**
+
+* **Word overlap**: Jaccard similarity, cosine similarity between headlines/summaries.
+* **Topic overlap**: How much of the content clusters into the same themes across outlets.
+* **Sentiment polarity difference**: For the same event, is one outlet positive while another is negative?
+
+---
+
+### 🔹 6. **Longer-term patterns**
+
+* **Agenda-setting**: Which topics each outlet consistently prioritizes or ignores.
+* **Narrative tracking**: How coverage evolves over days — who shifts focus, who keeps repeating.
+* **Polarization analysis**: Outlets splitting into camps around political narratives.
+
+---
+
+⚡ **Example**: Suppose there’s a protest.
+
+* N12: “Thousands rally against government corruption”
+* Channel 14: “Left-wing activists disrupt central Tel Aviv”
+* Kan11: “Demonstrators gather in Tel Aviv amid political tensions”
+
+You could analyze:
+
+* Word choice (“rally” vs. “disrupt” vs. neutral “gather”).
+* Sentiment (negative vs. neutral).
+* Emphasis (corruption vs. left-wing vs. general politics).
+
+---
+
+👉 Would you like me to **turn this into a practical “analysis toolbox” list** (like a step-by-step workflow you can actually run on your dataset)? That way, instead of just theory, you’d have clear Python/NLP steps for each level.

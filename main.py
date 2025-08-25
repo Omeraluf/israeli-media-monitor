@@ -8,31 +8,33 @@ from analysis.group_similar import main as group_similar_main
 
 if __name__ == "__main__":
 
-    # try:
-    #     get_n12_rss_headlines()
-    # except Exception as e:
-    #     print(f"Failed to scrape N12: {e}")
+    print("-------------- Scraping --------------")
+    try:
+        get_n12_rss_headlines()
+    except Exception as e:
+        print(f"Failed to scrape N12: {e}")
     try:
         get_c14_headlines()
     except Exception as e:
         print(f"Failed to scrape Channel 14: {e}")
-    print("Scraping completed.")
+    print("-------------- Scraping Complete --------------")
 
+    print("-------------- Adapting --------------")
     # Adapters
     try:
         print("Starting Channel14 adapter...")
         c14_adapter_main()
     except Exception as e:
         print(f"Channel14 adapter failed: {e}")
-    print("Channel14 adapter completed.")
+    print("-------------- Adapting Complete --------------")
 
-
-    # try:
-    #     print("Starting preprocessing...")
-    #     preprocess_main()
-    # except Exception as e:
-    #     print(f"Preprocessing failed: {e}")
-    # print("Preprocessing completed.")
+    print("-------------- Preprocessing --------------")
+    try:
+        print("Starting preprocessing...")
+        preprocess_main()
+    except Exception as e:
+        print(f"Preprocessing failed: {e}")
+    print("-------------- Preprocessing Complete --------------")
 
     # try:
     #     print("Starting grouping similar articles...")
