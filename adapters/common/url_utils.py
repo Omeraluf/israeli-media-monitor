@@ -53,7 +53,6 @@ def build_record_key(source: str, url: str, url_id: Optional[str]) -> str:
 WS_RE = re.compile(r"\s+")
 
 
-#@@@@@@@@@ KEEP GOING FROM HERE @@@@@@@@@
 def normalize_text(text: str) -> str:
     """
     Normalize whitespace & punctuation in titles/summaries:

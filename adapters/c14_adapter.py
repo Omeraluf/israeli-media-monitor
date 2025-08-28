@@ -47,7 +47,10 @@ def adapt_records(raw_records):
 ### MAIN ###
 def main():
     # 1) Load raw data
+    i = -1
     for in_path in glob.glob(os.path.join(raw_dir, "c14_scraped_*.json")):
+        i += 1
+        print(f"Processing file {i}")
         with open(in_path, "r", encoding="utf-8") as f:
             raw_records = json.load(f)      #list of dicts
     
@@ -59,8 +62,8 @@ def main():
         out_path = os.path.join(out_dir, filename)
     
      # 4) save
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(adapted_records, f, ensure_ascii=False, indent=2)
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(adapted_records, f, ensure_ascii=False, indent=2)
     
     print(f"C14 Adapted data saved to {out_path}")
 

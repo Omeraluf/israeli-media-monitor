@@ -28,6 +28,7 @@ Thumbs.db
 .env
 
 # Data outputs
+data/
 data/processed/
 data/raw/
 data/final/
@@ -41,3 +42,5 @@ htmlcov/
 build/
 dist/
 
+# stopwords hebrew
+hebrew_stopswords_list_extended.txt
